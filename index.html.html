@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Elite Price System – إدارة التشغيل أيمن أبو ورده</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ========================= الإطارات الأساسية للحركات ========================= */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201, 167, 78, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 15px 10px rgba(201, 167, 78, 0); }
+            100% { transform: scale(1); }
+        }
+
+        /* ========================= CSS موحد لجميع الصفحات ========================= */
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: #0F1A2F;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ========================= تصميم صفحة تسجيل الدخول ========================= */
+        #loginContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-box {
+            background: rgba(15, 26, 47, 0.7);
+            border: 1px solid #c9a74e;
+            border-radius: 12px;
+            padding: 50px 40px;
+            width: 340px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: fadeInDown 0.8s ease-out;
+        }
+        .login-box h1 {
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        .login-box h1 .title-line-1{
+            display:block; font-size:42px; font-weight:700; color:#c9a74e;
+        }
+        .login-box h1 .title-line-2{
+            display:block; font-size:18px; font-weight:400; color:#d9c89f;
+        }
+
+        .textbox {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .textbox input {
+            width: 100%;
+            padding: 12px 10px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid #5a4b70;
+            outline: none;
+            color: white;
+            font-size: 17px;
+            text-align: right;
+            transition: border-bottom 0.3s;
+        }
+        .textbox input:focus {
+            border-bottom: 2px solid #c9a74e;
+        }
+        .textbox label {
+            position: absolute;
+            top: 12px;
+            right: 10px;
+            color: #aaa;
+            font-size: 17px;
+            transition: .3s ease-in-out;
+            pointer-events: none;
+        }
+        .textbox input:focus + label,
+        .textbox input:valid + label {
+            top: -20px;
+            right: 0px;
+            font-size: 13px;
+            color: #e8d39e;
+        }
+        #status-area {
+            margin-top: 25px;
+            min-height: 45px;
+        }
+        #message {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .success-color { color: #4CAF50; }
+        .error-color { color: #ff6347; }
+        .progress-container {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            visibility: hidden;
+        }
+        #progressBar {
+            height: 100%;
+            width: 0%;
+            background-color: #4CAF50;
+            transition: width 1.2s linear;
+        }
+        .btn {
+            animation: pulse 2s infinite;
+            background: #c9a74e;
+            color: #0F1A2F;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #e8d39e;
+            box-shadow: 0 0 15px rgba(232, 211, 158, 0.5);
+            animation: none;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            animation: none;
+        }
+        .signature {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #d9c89f;
+            opacity: 0.9;
+        }
+
+        /* ========================= تصميم صفحة المحتوى (الأسعار) ========================= */
+        #contentContainer {
+            padding: 30px 20px;
+        }
+        #contentContainer h1 {
+            color: #e8d39e;
+            font-size: 40px;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(232, 211, 158, 0.2);
+            animation: fadeInDown 1s ease-out;
+        }
+        .branch {
+            width: 90%;
+            max-width: 1000px;
+            margin: 35px auto;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(201, 167, 78, 0.5);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s;
+            opacity: 0;
+        }
+        .branch:hover { transform: translateY(-5px); }
+        .branch h2 {
+            color: #c9a74e;
+            font-size: 28px;
+            border-bottom: 2px solid rgba(201, 167, 78, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 18px;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 15px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        th {
+            color: #e8d39e;
+            background: rgba(201, 167, 78, 0.1);
+            font-size: 20px;
+        }
+        td:first-child { text-align: right; padding-right: 20px; }
+        input[type=number] {
+            width: 110px;
+            text-align: center;
+            border-radius: 6px;
+            border: 1px solid #c9a74e;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: monospace;
+            padding: 5px;
+            background: #1a2a47;
+            color: #fff;
+        }
+        .rate-input { width: 80px; }
+        input.booking {
+            background: #3a4a67;
+            color: #fff;
+            border: 1px solid #4CAF50;
+        }
+        .unify {
+            margin: 10px 0 25px;
+            font-size: 18px;
+            background: rgba(201, 167, 78, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .footer {
+            color: #e8d39e;
+            margin-top: 40px;
+            font-size: 16px;
+            padding: 10px;
+            border-top: 1px solid rgba(201, 167, 78, 0.3);
+        }
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ff6347;
+            color: #fff;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 100;
+        }
+        .logout-btn:hover { background: #e8553f; }
+    </style>
+</head>
+<body>
+
+    <!-- ========================= صفحة تسجيل الدخول ========================= -->
+    <div id="loginContainer">
+        <div class="login-box">
+            <h1>
+                <span class="title-line-1">تسجيل الدخول</span>
+                <span class="title-line-2">لمنظومة أسعار بوكينج</span>
+            </h1>
+
+            <form id="loginForm">
+                <div class="textbox">
+                    <input type="text" id="username" required>
+                    <label for="username">اسم المستخدم</label>
+                </div>
+
+                <div class="textbox">
+                    <input type="password" id="password" required>
+                    <label for="password">كلمة المرور</label>
+                </div>
+
+                <div id="status-area">
+                    <div class="progress-container">
+                        <div id="progressBar"></div>
+                    </div>
+                    <div id="message"></div>
+                </div>
+
+                <button type="submit" class="btn">تسجيل الدخول</button>
+                 
+
+                <div class="signature" style="margin-top: 25px;">
+                    بواسطة - أيمن أبو وردة<br>
+                    0570707121
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ========================= صفحة المحتوى ========================= -->
+    <div id="contentContainer" style="display:none; padding-top: 30px; position: relative;">
+        <button class="logout-btn" onclick="setupLoginPage()">🔒 تسجيل خروج</button>
+        <h1 style="padding: 0 20px;">إدارة التشغيل – أيمن أبو ورده</h1>
+
+        <!-- فرع الكورنيش -->
+        <div class="branch" id="corniche">
+            <h2>🏨 فرع الكورنيش</h2>
+            <div class="unify">
+                <label><input type="checkbox" id="unifyC" onchange="setUnify('c')"> توحيد النسبة على جميع الصفوف</label>
+                <input type="number" id="rateC" value="45" onchange="setUnify('c')"> %
+            </div>
+            <table>
+                <tr><th>مكونات الوحدة</th><th>السعر العادي</th><th>نسبة الزيادة (%)</th><th>سعر بوكينج</th></tr>
+                <tr><td>تؤم وكينج</td><td><input id="c_p1" value="230" oninput="calc('c',1)"></td><td><input id="c_r1" value="45" oninput="calc('c',1)" class="rate-input"></td><td><input id="c_b1" class="booking" readonly></td></tr>
+                <tr><td>ستوديو</td><td><input id="c_p2" value="340" oninput="calc('c',2)"></td><td><input id="c_r2" value="45" oninput="calc('c',2)" class="rate-input"></td><td><input id="c_b2" class="booking" readonly></td></tr>
+                <tr><td>شقة غرفة وصالة</td><td><input id="c_p3" value="370" oninput="calc('c',3)"></td><td><input id="c_r3" value="45" oninput="calc('c',3)" class="rate-input"></td><td><input id="c_b3" class="booking" readonly></td></tr>
+                <tr><td>غرفتين وصالة</td><td><input id="c_p4" value="400" oninput="calc('c',4)"></td><td><input id="c_r4" value="45" oninput="calc('c',4)" class="rate-input"></td><td><input id="c_b4" class="booking" readonly></td></tr>
+                <tr><td>VIP</td><td><input id="c_p5" value="850" oninput="calc('c',5)"></td><td><input id="c_r5" value="45" oninput="calc('c',5)" class="rate-input"></td><td><input id="c_b5" class="booking" readonly></td></tr>
+            </table>
+            <button class="btn" onclick="downloadExcel('c')">💾 تحميل أسعار فرع الكورنيش (Excel)</button>
+        </div>
+
+        <!-- فرع الأندلس -->
+        <div class="branch" id="andalus">
+            <h2>🏨 فرع الأندلس</h2>
+            <div class="unify">
+                <label><input type="checkbox" id="unifyA" onchange="setUnify('a')"> توحيد النسبة على جميع الصفوف</label>
+                <input type="number" id="rateA" value="45" onchange="setUnify('a')"> %
+            </div>
+            <table>
+                <tr><th>مكونات الوحدة</th><th>السعر العادي</th><th>نسبة الزيادة (%)</th><th>سعر بوكينج</th></tr>
+                <tr><td>غرفة وحمام خلفية سريرين (تؤم)</td><td><input id="a_p1" value="190" oninput="calc('a',1)"></td><td><input id="a_r1" value="45" oninput="calc('a',1)" class="rate-input"></td><td><input id="a_b1" class="booking" readonly></td></tr>
+                <tr><td>غرفة وحمام خلفية سرير مزدوج (كينج)</td><td><input id="a_p2" value="205" oninput="calc('a',2)"></td><td><input id="a_r2" value="45" oninput="calc('a',2)" class="rate-input"></td><td><input id="a_b2" class="booking" readonly></td></tr>
+                <tr><td>غرفة مطلة على الشارع (ستوديو)</td><td><input id="a_p3" value="220" oninput="calc('a',3)"></td><td><input id="a_r3" value="45" oninput="calc('a',3)" class="rate-input"></td><td><input id="a_b3" class="booking" readonly></td></tr>
+                <tr><td>غرفة وصالة مطلة على الشارع</td><td><input id="a_p4" value="290" oninput="calc('a',4)"></td><td><input id="a_r4" value="45" oninput="calc('a',4)" class="rate-input"></td><td><input id="a_b4" class="booking" readonly></td></tr>
+                <tr><td>غرفتين خلفيتين سرير مزدوج وسريرين تؤام (3+4)</td><td><input id="a_p5" value="390" oninput="calc('a',5)"></td><td><input id="a_r5" value="45" oninput="calc('a',5)" class="rate-input"></td><td><input id="a_b5" class="booking" readonly></td></tr>
+                <tr><td>غرفتين وصالة على الشارع سريرين مزدوج (2+1)</td><td><input id="a_p6" value="420" oninput="calc('a',6)"></td><td><input id="a_r6" value="45" oninput="calc('a',6)" class="rate-input"></td><td><input id="a_b6" class="booking" readonly></td></tr>
+                <tr><td>غرفتين وصالة وملحق وجاكوزي وبخار VIP 601</td><td><input id="a_p7" value="570" oninput="calc('a',7)"></td><td><input id="a_r7" value="45" oninput="calc('a',7)" class="rate-input"></td><td><input id="a_b7" class="booking" readonly></td></tr>
+                <tr><td>غرفة وصالة وجاكوزي VIP 602</td><td><input id="a_p8" value="370" oninput="calc('a',8)"></td><td><input id="a_r8" value="45" oninput="calc('a',8)" class="rate-input"></td><td><input id="a_b8" class="booking" readonly></td></tr>
+                <tr><td>غرفة وملحق خارجي VIP 604</td><td><input id="a_p9" value="320" oninput="calc('a',9)"></td><td><input id="a_r9" value="45" oninput="calc('a',9)" class="rate-input"></td><td><input id="a_b9" class="booking" readonly></td></tr>
+            </table>
+            <button class="btn" onclick="downloadExcel('a')">💾 تحميل أسعار فرع الأندلس (Excel)</button>
+        </div>
+
+        <div class="footer" id="footer">إدارة التشغيل | آخر تحديث: </div>
+    </div>
+
+    <!-- ========================= المكتبة الخاصة بتصدير الإكسل ========================= -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <script>
+        // ========================= وظائف المحتوى (حساب الأسعار والإكسل) =========================
+        function calc(branch,i){
+            let p=parseFloat(document.getElementById(branch+'_p'+i).value)||0;
+            let r=parseFloat(document.getElementById(branch+'_r'+i).value)||0;
+            document.getElementById(branch+'_b'+i).value=(p*(1+r/100)).toFixed(2);
+        }
+        function setUnify(branch){
+            let unify=document.getElementById(branch==='c'?'unifyC':'unifyA').checked;
+            let rate=parseFloat(document.getElementById(branch==='c'?'rateC':'rateA').value);
+            let rows=branch==='c'?5:9;
+            for(let i=1;i<=rows;i++){
+                document.getElementById(branch+'_r'+i).value=unify?rate:45;
+                calc(branch,i);
+            }
+        }
+        function arabicDate(d){
+            const m=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+            return d.getDate()+' '+m[d.getMonth()]+' '+d.getFullYear();
+        }
+        function applyBranchAnimation() {
+            const branches = document.querySelectorAll('.branch');
+            branches.forEach((branch, index) => {
+                setTimeout(() => {
+                    branch.style.opacity = 1;
+                    branch.style.animation = `fadeInUp 0.8s ease-out`;
+                }, index * 200);
+            });
+        }
+        function downloadExcel(branch){
+            const wb=XLSX.utils.book_new();
+
+            const title="إدارة التشغيل – أيمن أبو ورده";
+            const branchName=(branch==='c'?'فرع الكورنيش':'فرع الأندلس');
+            const now=new Date();
+            const dateText="تاريخ التصدير: "+arabicDate(now);
+            const timeText="وقت التصدير: "+now.toLocaleTimeString('en-GB');
+            const rows=(branch==='c'?5:9);
+
+            let data=[
+                [title],
+                [branchName],
+                [],
+                ["مكونات الوحدة","السعر العادي","سعر بوكينج"]
+            ];
+            for(let i=1;i<=rows;i++){
+                data.push([
+                    document.querySelector(`#${branch==='c'?'corniche':'andalus'} table tr:nth-child(${i+1}) td:first-child`).innerText,
+                    document.getElementById(branch+'_p'+i).value,
+                    document.getElementById(branch+'_b'+i).value
+                ]);
+            }
+            data.push([]);
+            data.push([dateText]);
+            data.push([timeText]);
+
+            const ws=XLSX.utils.aoa_to_sheet(data);
+            ws['!cols']=[{wch:40},{wch:15},{wch:20}];
+            ws['!merges']=[ {s:{r:0,c:0},e:{r:0,c:2}}, {s:{r:1,c:0},e:{r:1,c:2}} ];
+            XLSX.utils.book_append_sheet(wb,ws,(branch==='c'?"Corniche Branch":"Andalus Branch"));
+            XLSX.writeFile(wb,(branch==='c'?"Elite_Corniche.xlsx":"Elite_Andalus.xlsx"));
+        }
+
+        // ========================= وظائف التبديل والأمان =========================
+        function setupLoginPage() {
+            sessionStorage.removeItem('isAuthenticated');
+            document.getElementById('contentContainer').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('password').value = '';
+            document.getElementById('message').innerText = '';
+            const loginButton = document.querySelector('.btn');
+            loginButton.disabled = false;
+            loginButton.style.animation = 'pulse 2s infinite';
+
+            const savedUsername = localStorage.getItem('username');
+            if (savedUsername) document.getElementById('username').value = savedUsername;
+        }
+
+        function showContentPage() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('contentContainer').style.display = 'block';
+            document.getElementById('footer').innerText+=' '+arabicDate(new Date());
+            for(let i=1;i<=5;i++)calc('c',i);
+            for(let i=1;i<=9;i++)calc('a',i);
+            applyBranchAnimation();
+        }
+
+        // معالجة نموذج تسجيل الدخول
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const correctUsername = "ayman";
+            const correctPassword = "ayman2025";
+
+            const enteredUsername = document.getElementById('username').value.trim();
+            const enteredPassword = document.getElementById('password').value.trim();
+            const messageElement = document.getElementById('message');
+            const progressBar = document.getElementById('progressBar');
+            const progressContainer = document.querySelector('.progress-container');
+
+            messageElement.innerText = "";
+            messageElement.className = "";
+            progressBar.style.width = '0%';
+            progressContainer.style.visibility = 'hidden';
+
+            const loginButton = document.querySelector('.btn');
+            loginButton.disabled = true;
+            loginButton.style.animation = 'none';
+
+            // احفظ اسم المستخدم المُدخل
+            localStorage.setItem('username', enteredUsername);
+
+            // منع العربية/Uppercase
+            const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+            if (arabicRegex.test(enteredUsername) || arabicRegex.test(enteredPassword)) {
+                messageElement.innerText = "⚠️ الرجاء استخدام لوحة المفاتيح الإنجليزية فقط (بدون أحرف عربية).";
+                messageElement.classList.add('error-color');
+                document.getElementById('password').value = '';
+                loginButton.disabled = false;
+                loginButton.style.animation = 'pulse 2s infinite';
+                return;
+            }
+            if (enteredUsername !== enteredUsername.toLowerCase() || enteredPassword !== enteredPassword.toLowerCase()) {
+                messageElement.innerText = "⚠️ استخدم أحرف صغيرة (lowercase) فقط.";
+                messageElement.classList.add('error-color');
+                document.getElementById('password').value = '';
+                loginButton.disabled = false;
+                loginButton.style.animation = 'pulse 2s infinite';
+                return;
+            }
+
+            // التحقق النهائي
+            if (enteredUsername === correctUsername && enteredPassword === correctPassword) {
+                messageElement.innerText = "تم تسجيل الدخول بنجاح! جارِ فتح المنظومة...";
+                messageElement.classList.add('success-color');
+                progressContainer.style.visibility = 'visible';
+                progressBar.style.width = '100%';
+
+                // ثبّت الجلسة، ثم اعرض صفحة المحتوى في نفس الملف
+                sessionStorage.setItem('isAuthenticated', 'true');
+                setTimeout(() => { showContentPage(); }, 900);
+            } else {
+                messageElement.innerText = "خطأ في اسم المستخدم أو كلمة المرور.";
+                messageElement.classList.add('error-color');
+                document.getElementById('password').value = '';
+                setTimeout(() => {
+                    loginButton.disabled = false;
+                    loginButton.style.animation = 'pulse 2s infinite';
+                }, 400);
+            }
+        });
+
+        // عند تحميل الصفحة
+        window.onload = function() {
+            if (sessionStorage.getItem('isAuthenticated') === 'true') {
+                showContentPage();
+            } else {
+                setupLoginPage();
+            }
+        };
+    </script>
+</body>
+</html>
